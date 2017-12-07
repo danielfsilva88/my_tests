@@ -1,0 +1,72 @@
+# install's tutorials
+#*official # https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/ 
+# http://containertutorials.com/installation/installation-ubuntu-16.04.html
+# https://www.techrepublic.com/article/how-to-install-docker-on-ubuntu-16-04/
+# https://www.howtoforge.com/tutorial/docker-installation-and-usage-on-ubuntu-16.04/
+# https://www.digitalocean.com/community/tutorials/como-instalar-e-usar-o-docker-no-ubuntu-16-04-pt
+#*to install on AWS # http://www.amazonwebservicesforum.com/2017/06/install-docker-on-ubuntu-1604-aws-ec2.html
+
+# PARA INICIO DE QUALQUER SCRIPT
+# #!/bin/bash
+
+# docker install
+echo "installing docker"
+sudo apt update
+sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+sudo apt-add-repository 'deb https://apt.dockerproject.org/repo ubuntu-xenial main'
+sudo apt update
+apt policy docker-engine
+sudo apt install -y docker-engine
+
+# to check service if u need it
+# sudo systemctl status docker
+
+# using docker without sudo
+# sudo usermod -aG docker $(whoami)
+
+# using docker to install ubuntu
+echo "pulling ubuntu into container"
+sudo docker pull ubuntu
+sudo docker run -it ubuntu
+
+# inside ubuntu docker doesn't need sudo
+echo "starting ubuntu docker"
+apt update
+apt install -y wget
+
+# install java
+echo "installing java"
+apt install -y default-jdk
+
+# install 72c
+echo "installing 72c"
+wget "https://github.com/influunt/influunt/releases/download/1.0.8/72c_linux_1.8.deb"
+dpkg -i 72c_linux_1.8.deb
+
+# create a virtual serial device and running it in BackGround
+echo "installing python/pip/pyserial"
+apt install -y python python-pip
+pip install pyserial
+
+echo "creating openserial"
+cat <<EOF>> /root/openserial.py 
+#!/usr/bin/python
+import pty
+pty.openpty()
+import time
+while True:
+    time.sleep(10)
+EOF
+chmod 755 /root/openserial.py
+
+echo "running openserial in bg"
+./root/openserial.py &
+
+# changing 72c application.conf to use serial device created
+echo "updating 72c application.conf"
+mv /opt/72c/conf/application.conf .
+sed 's_/tty.usbmodem1411_/pts/0_' <application.conf >/opt/72c/conf/application.conf
+
+# running 72c
+echo "RUNNING 72 C \o/"
+/etc/init.d/72c run
