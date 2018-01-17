@@ -9,8 +9,9 @@ RUN apt-get update
 RUN apt-get install -y default-jdk python
 
 # install 72c
-COPY 72c_linux_1.8.deb .
-RUN dpkg -i 72c_linux_1.8.deb
+RUN wget https://github.com/influunt/influunt/releases/download/1.0.9/72c_linux_1_9.deb
+#COPY 72c_linux_1.8.deb .
+RUN dpkg -i 72c_linux_1.9.deb
 
 # open a serial port
 COPY openserial.py /root/
